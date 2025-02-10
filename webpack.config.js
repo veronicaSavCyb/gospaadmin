@@ -8,22 +8,38 @@ module.exports = {
   entry: './src/index.tsx',
   devtool: 'source-map',
   resolve: {
-    // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: ['.ts', '.tsx', '.js', '.json']
   },
   devServer: {
     hot: true,
-    disableHostCheck: true,
     historyApiFallback: true,
-    contentBase: path.resolve(__dirname, ''),
-    publicPath: '/'
+    static: {
+      directory: path.resolve(__dirname, 'public'), // Ensure static files are served correctly
+    },
+    port: 3100,
+    client: {
+      overlay: false,
+    },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Security-Policy":
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+        "style-src 'self' 'unsafe-inline' http://localhost:3100; " +
+        "font-src 'self' data: http://localhost:3100; " +
+        "img-src 'self' data: http://localhost:3100;",
+    },
+  },
+  watchOptions: {
+    poll: 1000, // Poll every second to check for file changes
+    aggregateTimeout: 300, // Delay rebuilds slightly to optimize performance
+    ignored: /node_modules/, // Ignore node_modules to reduce file watchers
   },
   output: {
     path: path.resolve(__dirname, 'assets'),
     filename: 'bundle.js',
-    publicPath: './'
+    publicPath: '/'
   },
-
   module: {
     rules: [
       {
@@ -32,16 +48,11 @@ module.exports = {
         exclude: /node_modules/
       },
       {
-        test: /\.(jpg|png|svg)$/,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 8192,
-              publicPath: '/'
-            }
-          }
-        ]
+        test: /\.(jpg|png|svg|ttf|woff|woff2|eot)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'assets/[name][ext]',
+        },
       },
       {
         test: /\.(less|css)$/,
@@ -70,7 +81,6 @@ module.exports = {
       template: './src/index.html',
       inject: true,
       hash: true,
-      path: './'
     }),
     new MiniCssExtractPlugin({
       filename: '[name].css',

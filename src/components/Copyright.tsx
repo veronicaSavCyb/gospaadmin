@@ -6,10 +6,7 @@ const Copyright = () => {
     <Stack className="copyright" justifyContent="center" style={{ height: 40, marginTop: 20 }}>
       <div className="container">
         <p>
-          © 2022, Made with ❤️ by{' '}
-          <a href="https://github.com/rsuite/rsuite" target="_blank" rel="noreferrer">
-            RSUITE
-          </a>
+          © 2025, Made with ❤️ by Nika
         </p>
       </div>
     </Stack>

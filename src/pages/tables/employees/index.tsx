@@ -1,21 +1,22 @@
 import React from 'react';
-import { Panel, Breadcrumb } from 'rsuite';
-import Calendar from './Calendar';
+import { Breadcrumb, Panel } from 'rsuite';
+import DataTable from './DataTable';
 
 const Page = () => {
   return (
     <Panel
       header={
         <>
-          <h3 className="title">Booking Calendar</h3>
+          <h3 className="title">Employees</h3>
           <Breadcrumb>
             <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-            <Breadcrumb.Item active>Booking Calendar</Breadcrumb.Item>
+            <Breadcrumb.Item>Tables</Breadcrumb.Item>
+            <Breadcrumb.Item active>Employees</Breadcrumb.Item>
           </Breadcrumb>
         </>
       }
     >
-      <Calendar />
+      <DataTable />
     </Panel>
   );
 };

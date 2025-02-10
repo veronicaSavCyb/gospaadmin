@@ -14,9 +14,11 @@ import Error503Page from './pages/authentication/503';
 import SignInPage from './pages/authentication/sign-in';
 import SignUpPage from './pages/authentication/sign-up';
 import MembersPage from './pages/tables/members';
+import EmployeesPage from './pages/tables/employees';
 import VirtualizedTablePage from './pages/tables/virtualized';
 import FormBasicPage from './pages/forms/basic';
 import FormWizardPage from './pages/forms/wizard';
+import SpaSalonWizardPage from './pages/forms/newSpaWidget';
 import CalendarPage from './pages/calendar';
 import { appNavs } from './config';
 
@@ -28,6 +30,7 @@ const App = () => {
           <Route path="/" element={<Frame navs={appNavs} />}>
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="table-employees" element={<EmployeesPage />} />
             <Route path="table-members" element={<MembersPage />} />
             <Route path="table-virtualized" element={<VirtualizedTablePage />} />
             <Route path="error-404" element={<Error404Page />} />
@@ -38,6 +41,7 @@ const App = () => {
             <Route path="sign-up" element={<SignUpPage />} />
             <Route path="form-basic" element={<FormBasicPage />} />
             <Route path="form-wizard" element={<FormWizardPage />} />
+            <Route path="spa-salon-wizard" element={<SpaSalonWizardPage />} />
             <Route path="calendar" element={<CalendarPage />} />
           </Route>
           <Route path="*" element={<Error404Page />} />

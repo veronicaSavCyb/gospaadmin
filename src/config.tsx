@@ -14,19 +14,24 @@ export const appNavs = [
   {
     eventKey: 'calendar',
     icon: <Icon as={VscCalendar} />,
-    title: 'Calendar',
+    title: 'Booking Calendar',
     to: '/calendar'
   },
   {
     eventKey: 'tables',
     icon: <Icon as={VscTable} />,
-    title: 'Tables',
+    title: 'Manage Resources',
     to: '/table-members',
     children: [
       {
         eventKey: 'members',
         title: 'Members',
         to: '/table-members'
+      },
+      {
+        eventKey: 'employees',
+        title: 'Employees',
+        to: '/table-employees'
       },
       {
         eventKey: 'virtualized',
@@ -50,6 +55,11 @@ export const appNavs = [
         eventKey: 'form-wizard',
         title: 'Wizard',
         to: '/form-wizard'
+      },
+      {
+        eventKey: 'spa-salon-wizard',
+        title: 'New Salon Wizard',
+        to: '/spa-salon-wizard'
       }
     ]
   },
