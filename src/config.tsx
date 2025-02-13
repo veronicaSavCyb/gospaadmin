@@ -34,6 +34,11 @@ export const appNavs = [
         to: '/table-employees'
       },
       {
+        eventKey: 'services',
+        title: 'Services',
+        to: '/table-services'
+      },
+      {
         eventKey: 'virtualized',
         title: 'Virtualized Table',
         to: '/table-virtualized'

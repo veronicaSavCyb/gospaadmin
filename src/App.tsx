@@ -15,6 +15,7 @@ import SignInPage from './pages/authentication/sign-in';
 import SignUpPage from './pages/authentication/sign-up';
 import MembersPage from './pages/tables/members';
 import EmployeesPage from './pages/tables/employees';
+import ServicesPage from './pages/tables/services';
 import VirtualizedTablePage from './pages/tables/virtualized';
 import FormBasicPage from './pages/forms/basic';
 import FormWizardPage from './pages/forms/wizard';
@@ -31,6 +32,7 @@ const App = () => {
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="table-employees" element={<EmployeesPage />} />
+            <Route path="table-services" element={<ServicesPage />}/>
             <Route path="table-members" element={<MembersPage />} />
             <Route path="table-virtualized" element={<VirtualizedTablePage />} />
             <Route path="error-404" element={<Error404Page />} />
