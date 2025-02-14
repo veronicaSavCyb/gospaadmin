@@ -20,6 +20,7 @@ class CreateUserView(generics.CreateAPIView):
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+    permission_classes = [IsAuthenticated]
 
     # ✅ Create a new service (POST /api/services/)
     def create(self, request, *args, **kwargs):

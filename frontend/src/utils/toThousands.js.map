@@ -1,0 +1,1 @@
+{"version":3,"file":"toThousands.js","sourceRoot":"","sources":["toThousands.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,UAAU,WAAW,CAAC,KAAa,EAAE,KAAK,GAAG,CAAC;IAC1D,OAAO,CAAC,KAAK,CAAC,OAAO,CAAC,KAAK,CAAC,GAAG,EAAE,CAAC,CAAC,OAAO,CAAC,+BAA+B,EAAE,KAAK,CAAC,CAAC;AACrF,CAAC"}
