@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Button, Stack } from 'rsuite';
+import { Table, Button, Stack, IconButton } from 'rsuite';
 import MoreIcon from '@rsuite/icons/legacy/More';
+import EditIcon from '@rsuite/icons/Edit';
+import TrashIcon from '@rsuite/icons/Trash';
 import ServicesDrawer from './ServicesDrawer';
-import { NameCell, ActionCell } from './ServicesCells';
+import { NameCell } from './ServicesCells';
 
 const { Column, HeaderCell, Cell } = Table;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-// ✅ Define the TypeScript interface for services
 interface Service {
   id?: number;
   name: string;
-  shortDescriptor: string;
-  detailedDescription: string;
+  short_descriptor: string;
+  detailed_description: string;
   category: string;
 }
 
@@ -21,16 +23,24 @@ const ServicesTable: React.FC = () => {
   const [showDrawer, setShowDrawer] = useState(false);
   const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null);
 
-  // ✅ Fix: Explicitly define the response type
   useEffect(() => {
-    axios.get<Service[]>('/api/services/')
-      .then(response => setData(response.data)) // ✅ Type now matches useState<Service[]>
+    axios.get<Service[]>(`${API_BASE_URL}/api/services/`)
+      .then(response => setData(response.data))
       .catch(error => console.error('Error fetching services:', error));
   }, []);
 
   const handleEdit = (service: Service) => {
     setServiceToEdit(service);
     setShowDrawer(true);
+  };
+
+  const handleDelete = (id: number | undefined) => {
+    if (!id) return;
+    axios.delete(`${API_BASE_URL}/api/services/${id}/`)
+      .then(() => {
+        setData(prevData => prevData.filter(service => service.id !== id));
+      })
+      .catch(error => console.error('Error deleting service:', error));
   };
 
   return (
@@ -49,7 +59,7 @@ const ServicesTable: React.FC = () => {
 
       <Table height={400} data={data}>
         <Column width={50} align="center">
-          <HeaderCell>Id</HeaderCell>
+          <HeaderCell>ID</HeaderCell>
           <Cell dataKey="id" />
         </Column>
 
@@ -60,12 +70,12 @@ const ServicesTable: React.FC = () => {
 
         <Column width={200}>
           <HeaderCell>Short Descriptor</HeaderCell>
-          <Cell dataKey="shortDescriptor" />
+          <Cell dataKey="short_descriptor" />
         </Column>
 
         <Column width={300}>
           <HeaderCell>Detailed Description</HeaderCell>
-          <Cell dataKey="detailedDescription" />
+          <Cell dataKey="detailed_description" />
         </Column>
 
         <Column width={160}>
@@ -73,11 +83,30 @@ const ServicesTable: React.FC = () => {
           <Cell dataKey="category" />
         </Column>
 
-        <Column width={120}>
+        {/* More Column with Edit and Delete Buttons */}
+        <Column width={120} align="center">
           <HeaderCell>
             <MoreIcon />
           </HeaderCell>
-          <ActionCell rowData={data} dataKey="id" onEdit={handleEdit} />
+          <Cell>
+            {(rowData: Service) => (
+              <Stack spacing={8}>
+                <IconButton
+                  icon={<EditIcon />}
+                  appearance="subtle"
+                  size="xs"
+                  onClick={() => handleEdit(rowData)}
+                />
+                <IconButton
+                  icon={<TrashIcon />}
+                  appearance="ghost"
+                  color="red"
+                  size="xs"
+                  onClick={() => handleDelete(rowData.id)}
+                />
+              </Stack>
+            )}
+          </Cell>
         </Column>
       </Table>
 

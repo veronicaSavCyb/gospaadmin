@@ -5,8 +5,8 @@ import { Drawer, Button, Form } from 'rsuite';
 interface Service {
   id?: number;
   name: string;
-  shortDescriptor: string;
-  detailedDescription: string;
+  short_descriptor: string;
+  detailed_description: string;
   category: string;
 }
 
@@ -19,8 +19,8 @@ interface ServicesDrawerProps {
 const ServicesDrawer: React.FC<ServicesDrawerProps> = ({ open, onClose, serviceToEdit }) => {
   const [formValue, setFormValue] = useState<Service>({
     name: '',
-    shortDescriptor: '',
-    detailedDescription: '',
+    short_descriptor: '',
+    detailed_description: '',
     category: ''
   });
 
@@ -28,7 +28,7 @@ const ServicesDrawer: React.FC<ServicesDrawerProps> = ({ open, onClose, serviceT
     if (serviceToEdit) {
       setFormValue(serviceToEdit);
     } else {
-      setFormValue({ name: '', shortDescriptor: '', detailedDescription: '', category: '' });
+      setFormValue({ name: '', short_descriptor: '', detailed_description: '', category: '' });
     }
   }, [serviceToEdit]);
 
@@ -74,13 +74,15 @@ const ServicesDrawer: React.FC<ServicesDrawerProps> = ({ open, onClose, serviceT
 
           <Form.Group>
             <Form.ControlLabel>Short Descriptor</Form.ControlLabel>
-            <Form.Control name="shortDescriptor" required />
+            <Form.Control name="short_descriptor" required />
           </Form.Group>
 
           <Form.Group>
             <Form.ControlLabel>Detailed Description</Form.ControlLabel>
-            <Form.Control name="detailedDescription" as="textarea" rows={3} required />
+            <Form.Control name="detailed_description" required />
           </Form.Group>
+
+
 
           <Form.Group>
             <Form.ControlLabel>Category</Form.ControlLabel>

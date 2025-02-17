@@ -7,7 +7,7 @@ const Page = () => {
     <Panel
       header={
         <>
-          <h3 className="title"> My Services</h3>
+          <h2 className="title"> My Services</h2>
           <Breadcrumb>
             <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
             <Breadcrumb.Item>Tables</Breadcrumb.Item>

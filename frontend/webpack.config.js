@@ -1,8 +1,13 @@
+const webpack = require('webpack'); 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlwebpackPlugin = require('html-webpack-plugin');
+const dotenv = require('dotenv');  
+
+// ✅ Load environment variables from .env file
+dotenv.config();
 
 module.exports = {
   entry: './src/index.tsx', // Ensure entry path is correct
@@ -22,12 +27,7 @@ module.exports = {
     },
     headers: {
       "Access-Control-Allow-Origin": "*",
-      "Content-Security-Policy":
-        "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-        "style-src 'self' 'unsafe-inline' http://localhost:3100; " +
-        "font-src 'self' data: http://localhost:3100; " +
-        "img-src 'self' data: http://localhost:3100;",
+      "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' http://localhost:3100; font-src 'self' data: http://localhost:3100; img-src 'self' data: http://localhost:3100; connect-src 'self' http://localhost:8000", // ✅ Now in a single line
     },
   },
   watchOptions: {
@@ -85,6 +85,9 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[id].css'
-    })
+    }),
+    new webpack.DefinePlugin({
+      'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL), // ✅ Inject env variable
+    }),
   ]
 };
