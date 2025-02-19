@@ -62,18 +62,25 @@ const DrawerView = ({ open, onClose, employeeId = null }: { open: boolean; onClo
   const isDropdownDisabled = availableServices.length === 0;
 
   const handleSave = () => {
-    fetch(`${API_BASE_URL}/api/employees/${employeeId || ""}/`, {
+    fetch(`${API_BASE_URL}/api/employees/${employeeId || ""}`, {
       method: employeeId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...employeeData, assigned_services: selectedServices.map(id => parseInt(id)) }),
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`Error ${res.status}: ${errorText}`);
+        }
+        return res.json();
+      })
       .then(() => {
         onClose();
-        window.dispatchEvent(new Event("employeeUpdated")); // 🔹 Dispatch event after save
+        window.dispatchEvent(new Event("employeeUpdated"));
       })
       .catch((err) => console.error("Error saving employee:", err));
   };
+  
   
   
   

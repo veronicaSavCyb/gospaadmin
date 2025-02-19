@@ -17,18 +17,31 @@ const { getHeight } = DOMHelper;
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const DataTable = () => {
-  const [showDrawer, setShowDrawer] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [employees, setEmployees] = useState([]);
+interface Service {
+  name: string;
+}
+
+interface Employee {
+  id: number;
+  first_name: string;
+  email: string;
+  contact_number?: string;
+  avatar?: string;
+  assigned_services?: Service[];
+}
+
+const DataTable: React.FC = () => {
+  const [showDrawer, setShowDrawer] = useState<boolean>(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
   // Function to fetch employees
   const fetchEmployees = () => {
     setLoading(true);
     fetch(`${API_BASE_URL}/api/employees/`)
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: Employee[]) => {
         setEmployees(data);
         setLoading(false);
       })
@@ -48,12 +61,12 @@ const DataTable = () => {
     };
   }, []);
 
-  const handleEdit = (employee) => {
+  const handleEdit = (employee: Employee) => {
     setEditingEmployee(employee);
     setShowDrawer(true);
   };
 
-  const handleDelete = (employeeId) => {
+  const handleDelete = (employeeId: number) => {
     fetch(`${API_BASE_URL}/api/employees/${employeeId}/`, {
       method: 'DELETE',
     })
@@ -104,8 +117,8 @@ const DataTable = () => {
           <Column width={250}>
             <HeaderCell>Assigned Services</HeaderCell>
             <Cell>
-              {(rowData) => 
-                rowData.assigned_services?.length > 0 
+              {(rowData: Employee) => 
+                rowData.assigned_services && rowData.assigned_services.length > 0 
                   ? rowData.assigned_services.map((service) => service.name).join(", ") 
                   : "No Services Assigned"
               }
@@ -115,7 +128,7 @@ const DataTable = () => {
           <Column width={120} align="center">
             <HeaderCell>Actions</HeaderCell>
             <Cell>
-              {(rowData) => (
+              {(rowData: Employee) => (
                 <Stack spacing={10}>
                   <IconButton icon={<EditIcon />} appearance="subtle" onClick={() => handleEdit(rowData)} />
                   <IconButton icon={<TrashIcon />} appearance="subtle" color="red" onClick={() => handleDelete(rowData.id)} />
@@ -126,7 +139,7 @@ const DataTable = () => {
         </Table>
       )}
 
-      <DrawerView open={showDrawer} onClose={() => setShowDrawer(false)} employeeId={editingEmployee?.id} />
+      <DrawerView open={showDrawer} onClose={() => setShowDrawer(false)} employeeId={editingEmployee?.id ?? null} />
     </>
   );
 };

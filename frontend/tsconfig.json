@@ -12,14 +12,15 @@
     "moduleResolution": "node",
     "target": "esnext",
     "module": "esnext",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]
     },
     "typeRoots": ["./node_modules/@types"],
-    "types": ["node", "json-schema", "react", "react-dom", "react-router-dom", "react-intl"]
+    "types": ["node", "json-schema", "react", "react-dom", "react-router-dom", "react-intl"],
+    "resolveJsonModule": true
   },
   "exclude": ["node_modules"],
   "include": ["./src/**/*.ts", "./src/**/*.tsx"]

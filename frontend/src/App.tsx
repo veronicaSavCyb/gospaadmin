@@ -1,9 +1,4 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { IntlProvider } from 'react-intl';
-import { CustomProvider } from 'rsuite';
-import enGB from 'rsuite/locales/en_GB';
-import locales from './locales';
 import Frame from './components/Frame';
 import DashboardPage from './pages/dashboard';
 import Error404Page from './pages/authentication/404';
