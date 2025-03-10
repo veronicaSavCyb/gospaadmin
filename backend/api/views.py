@@ -6,8 +6,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework import status
-from .models import Service, Employee 
-from .serializers import ServiceSerializer, UserSerializer, EmployeeSerializer
+from .models import Service, Employee, Booking 
+from .serializers import ServiceSerializer, UserSerializer, EmployeeSerializer, BookingSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # USERS
@@ -56,7 +56,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            employee = serializer.save()
+        
+            # Get assigned_services from request
+            assigned_services_ids = request.data.get("assigned_services", [])
+
+            # Assign ManyToMany field
+            if assigned_services_ids:
+                employee.assigned_services.set(assigned_services_ids)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -78,3 +86,38 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         instance.delete()
         return Response({"message": "Employee deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
+# BOOKINGS
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all().select_related("service")
+    serializer_class = BookingSerializer
+    permission_classes = [AllowAny]
+
+    # ✅ Create a new booking (POST /api/bookings/)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            booking = serializer.save()  # Save new booking
+            return Response(
+                BookingSerializer(booking).data,  # Return full service details
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # ✅ Update an existing booking (PUT / PATCH /api/bookings/{id}/)
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            booking = serializer.save()
+            return Response(
+                BookingSerializer(booking).data,  # Return updated booking details
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # ✅ Delete a booking (DELETE /api/bookings/{id}/)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({"message": "Booking deleted successfully"}, status=status.HTTP_204_NO_CONTENT)

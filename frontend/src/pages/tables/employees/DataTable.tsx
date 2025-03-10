@@ -28,6 +28,7 @@ interface Employee {
   contact_number?: string;
   avatar?: string;
   assigned_services?: Service[];
+  border_color?: string; 
 }
 
 const DataTable: React.FC = () => {
@@ -47,6 +48,8 @@ const DataTable: React.FC = () => {
       })
       .catch((err) => console.error("Error fetching employees:", err));
   };
+
+  
 
   // Fetch employees when component loads & listen for updates
   useEffect(() => {

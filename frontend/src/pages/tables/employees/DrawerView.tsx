@@ -30,6 +30,7 @@ const DrawerView = ({ open, onClose, employeeId = null }: { open: boolean; onClo
 
   useEffect(() => {
     if (employeeId) {
+      // Fetch employee details if editing
       fetch(`${API_BASE_URL}/api/employees/${employeeId}/`)
         .then((res) => res.json())
         .then((data) => {
@@ -45,9 +46,18 @@ const DrawerView = ({ open, onClose, employeeId = null }: { open: boolean; onClo
           setSelectedServices(data.assigned_services?.map((service: any) => service.id.toString()) || []);
         })
         .catch((err) => console.error("Error fetching employee:", err));
+    } else {
+      // ✅ Reset form when adding a new employee
+      setEmployeeData({
+        first_name: "",
+        last_name: "",
+        email: "",
+        contact_number: "",
+        rating: 0,
+      });
+      setSelectedServices([]);
     }
-  }, [employeeId]);
-  
+  }, [employeeId]); 
 
 
   const handleSelectService = (value: string) => {
@@ -62,10 +72,21 @@ const DrawerView = ({ open, onClose, employeeId = null }: { open: boolean; onClo
   const isDropdownDisabled = availableServices.length === 0;
 
   const handleSave = () => {
-    fetch(`${API_BASE_URL}/api/employees/${employeeId || ""}`, {
-      method: employeeId ? "PUT" : "POST",
+    const method = employeeId ? "PUT" : "POST";  // ✅ Determine if updating or creating
+    const url = employeeId 
+        ? `${API_BASE_URL}/api/employees/${employeeId}/`  // ✅ Ensure correct PUT URL
+        : `${API_BASE_URL}/api/employees/`;  // ✅ Ensure correct POST URL
+
+    fetch(url, {
+      method: method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...employeeData, assigned_services: selectedServices.map(id => parseInt(id)) }),
+      body: JSON.stringify({
+        first_name: employeeData.first_name.trim(),  // ✅ Ensure no empty spaces
+        last_name: employeeData.last_name.trim(),
+        email: employeeData.email.trim(),
+        contact_number: employeeData.contact_number.trim(),
+        assigned_services: selectedServices.map(id => parseInt(id)),  // ✅ Ensure correct format
+      }),
     })
       .then(async (res) => {
         if (!res.ok) {
@@ -79,11 +100,8 @@ const DrawerView = ({ open, onClose, employeeId = null }: { open: boolean; onClo
         window.dispatchEvent(new Event("employeeUpdated"));
       })
       .catch((err) => console.error("Error saving employee:", err));
-  };
-  
-  
-  
-  
+};
+
   
 
   return (

@@ -12,6 +12,7 @@ interface EmployeeRow {
   contact_number: string;
   assigned_services: { name: string }[]; // Removed service ID
   avatar?: string;
+  border_color?: string; 
 }
 
 export const NameCell = ({ rowData, dataKey, ...props }: CellProps<EmployeeRow>) => {
@@ -50,16 +51,17 @@ export const ImageCell = ({ rowData, dataKey, ...props }: CellProps<EmployeeRow>
     <Cell {...props} style={{ padding: 0 }}>
       <div
         style={{
-          width: 40,
-          height: 40,
+          width: 30,
+          height: 30,
           background: '#f5f5f5',
           borderRadius: 6,
           marginTop: 2,
           overflow: 'hidden',
-          display: 'inline-block'
+          display: 'inline-block',
+          border: `3px solid ${rowData.border_color || "#ccc"}`,
         }}
       >
-        <img src={rowData?.avatar || ''} width="40" />
+        <img src={rowData?.avatar || ""} width="30" style={{ borderRadius: "50%" }} />
       </div>
     </Cell>
   );

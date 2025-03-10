@@ -10,7 +10,6 @@ import {
 import EditIcon from '@rsuite/icons/Edit';
 import TrashIcon from '@rsuite/icons/Trash';
 import DrawerView from './DrawerView';
-import NameCell from './Cells';
 import ImageCell from './Cells';
 
 const { Column, HeaderCell, Cell } = Table;
@@ -101,7 +100,9 @@ const DataTable: React.FC = () => {
 
           <Column minWidth={160} flexGrow={1}>
             <HeaderCell>Employee Name</HeaderCell>
-            <NameCell dataKey="first_name" />
+            <Cell {...{ dataKey: 'first_name' }} />
+            {/* This is a JSX comment 
+            <NameCell dataKey="first_name" />*/}
           </Column>
 
           <Column width={200}>
