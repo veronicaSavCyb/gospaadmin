@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Drawer, Button, Form } from 'rsuite';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 interface Service {
   id?: number;
   name: string;
@@ -14,9 +16,10 @@ interface ServicesDrawerProps {
   open: boolean;
   onClose: () => void;
   serviceToEdit?: Service | null;
+  onServiceSaved: (newService: Service) => void; // ✅ Add this callback prop
 }
 
-const ServicesDrawer: React.FC<ServicesDrawerProps> = ({ open, onClose, serviceToEdit }) => {
+const ServicesDrawer: React.FC<ServicesDrawerProps> = ({ open, onClose, serviceToEdit, onServiceSaved }) => {
   const [formValue, setFormValue] = useState<Service>({
     name: '',
     short_descriptor: '',
@@ -32,22 +35,25 @@ const ServicesDrawer: React.FC<ServicesDrawerProps> = ({ open, onClose, serviceT
     }
   }, [serviceToEdit]);
 
-  // ✅ Correct the onChange function by explicitly handling form updates
+  // ✅ Correctly handle form changes
   const handleFormChange = (value: Record<string, any>) => {
-    setFormValue(prev => ({ ...prev, ...value })); // ✅ Merge new values with existing state
+    setFormValue(prev => ({ ...prev, ...value }));
   };
 
+  // ✅ Save the service (CREATE or UPDATE)
   const handleSubmit = async () => {
     try {
+      let savedService: Service;
       if (serviceToEdit?.id) {
-        // ✅ Update existing service
-        await axios.put(`/api/services/${serviceToEdit.id}/`, formValue);
+        const response = await axios.put(`${API_BASE_URL}/api/services/${serviceToEdit.id}/`, formValue);
+        savedService = response.data;
       } else {
-        // ✅ Create a new service
-        await axios.post('/api/services/', formValue);
+        const response = await axios.post(`${API_BASE_URL}/api/services/`, formValue);
+        savedService = response.data;
       }
-      onClose();
-      window.location.reload();
+
+      onServiceSaved(savedService); // ✅ Update service table dynamically
+      onClose(); // ✅ Close drawer after saving
     } catch (error) {
       console.error('Error saving service:', error);
     }
@@ -81,8 +87,6 @@ const ServicesDrawer: React.FC<ServicesDrawerProps> = ({ open, onClose, serviceT
             <Form.ControlLabel>Detailed Description</Form.ControlLabel>
             <Form.Control name="detailed_description" required />
           </Form.Group>
-
-
 
           <Form.Group>
             <Form.ControlLabel>Category</Form.ControlLabel>

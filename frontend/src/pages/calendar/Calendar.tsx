@@ -22,6 +22,8 @@ const Calendar = () => {
       fetch(`${API_BASE_URL}/api/bookings/`).then(res => res.json())
     ])
     .then(([employeeData, bookingData]) => {
+      console.log("Fetched Booking Data:", bookingData);
+
       const employeeMap = employeeData.reduce((acc: Record<number, string>, emp: any) => {
         acc[emp.id] = emp.border_color || 'black';
         return acc;
@@ -42,41 +44,61 @@ const Calendar = () => {
         duration: booking.duration,
         service_details: booking.service_details
       }));
-  
+      console.log("Formatted Events:", formattedEvents);   
       setEvents(formattedEvents);
     })
     .catch((error) => console.error("Error fetching data:", error));
   }, []);
   
   
-  const handleAddEvent = (newBooking: any) => {
-    const employeeColor = employees.find(emp => emp.id === newBooking.employee)?.border_color || 'black';
+  const handleAddEvent = (updatedBooking: any) => {
+    const employeeColor = employees.find(emp => emp.id === updatedBooking.employee)?.border_color || 'black';
+    const serviceName = updatedBooking.service_details?.name || "Unknown Service";
 
-    const serviceName = newBooking.service_details?.name || "Unknown Service"; 
-
-    const bookingDateTime = new Date(`${newBooking.booking_date}T${newBooking.booking_time}`);
+    const bookingDateTime = new Date(`${updatedBooking.booking_date}T${updatedBooking.booking_time}`);
     const localStart = new Date(bookingDateTime.getTime() - bookingDateTime.getTimezoneOffset() * 60000);
-  
-    const localEnd = newBooking.duration 
-      ? new Date(localStart.getTime() + newBooking.duration * 60000)
-      : new Date(localStart.getTime() + 60 * 60000);
 
-    const newEvent = {
-      id: newBooking.id,
-      title: `${newBooking.customer_name} - ${serviceName}`,
-      start: localStart.toISOString(),
-      end: localEnd.toISOString(),
-      borderColor: employeeColor,
-      display: 'block',
-      customer_name: newBooking.customer_name,
-      phone: newBooking.phone,
-      employee: newBooking.employee,
-      duration: newBooking.duration,
-      service_details: newBooking.service_details
-    };
+    const localEnd = updatedBooking.duration 
+        ? new Date(localStart.getTime() + updatedBooking.duration * 60000)
+        : new Date(localStart.getTime() + 60 * 60000);
 
-    setEvents((prevEvents) => [...prevEvents, newEvent]);
+    setEvents(prevEvents => {
+        const eventExists = prevEvents.some(event => event.id === updatedBooking.id);
+
+        return eventExists
+            ? prevEvents.map(event =>
+                event.id === updatedBooking.id
+                    ? { 
+                        ...event,
+                        title: `${updatedBooking.customer_name} - ${serviceName}`,
+                        start: localStart.toISOString(),
+                        end: localEnd.toISOString(),
+                        borderColor: employeeColor,
+                        service_details: updatedBooking.service_details, // ✅ Ensure this is stored
+                        customer_name: updatedBooking.customer_name,     // ✅ Store customer name
+                        phone: updatedBooking.phone,                     // ✅ Store phone number
+                        employee: updatedBooking.employee,               // ✅ Store employee
+                        duration: updatedBooking.duration,               // ✅ Store duration
+                    }
+                    : event
+            )
+            : [...prevEvents, {
+                id: updatedBooking.id,
+                title: `${updatedBooking.customer_name} - ${serviceName}`,
+                start: localStart.toISOString(),
+                end: localEnd.toISOString(),
+                borderColor: employeeColor,
+                display: 'block',
+                service_details: updatedBooking.service_details, // ✅ Ensure this is stored
+                customer_name: updatedBooking.customer_name,
+                phone: updatedBooking.phone,
+                employee: updatedBooking.employee,
+                duration: updatedBooking.duration,
+            }];
+    });
 };
+
+
 
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
@@ -91,6 +113,8 @@ const Calendar = () => {
   const handleEventClick = (clickInfo: any) => {
     const eventId = Number(clickInfo.event.id);
     const clickedEvent = events.find(event => event.id === eventId);
+
+    console.log("Clicked Event Data:", clickedEvent);
     
     if (clickedEvent) {
       setSelectedEvent(clickedEvent);
@@ -141,7 +165,7 @@ const Calendar = () => {
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,timeGridDay'
         }}
-        initialView="dayGridMonth"
+        initialView="timeGridDay"
         weekends
         editable
         selectable
@@ -155,12 +179,31 @@ const Calendar = () => {
         select={handleDateSelect}
         eventClick={handleEventClick}
         eventDrop={handleEventDrop} 
-        eventContent={(eventInfo) => (
-          <div style={{ borderLeft: `4px solid ${eventInfo.event.borderColor}`, paddingLeft: '5px' }}>
-            <b>{eventInfo.timeText}</b>
-            <span>{eventInfo.event.title}</span>
-          </div>
-        )}
+        eventContent={(eventInfo) => {
+          const eventTime = new Date(eventInfo.event.start as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const customerName = eventInfo.event.extendedProps?.customer_name || "Unknown";
+          const serviceName = eventInfo.event.extendedProps?.service_details?.name || "Unknown Service";
+        
+          // Detect if we're in month view to apply text truncation
+          const isMonthView = eventInfo.view.type === "dayGridMonth";
+        
+          return (
+            <div style={{
+              borderLeft: `4px solid ${eventInfo.event.borderColor}`,
+              paddingLeft: '5px',
+              whiteSpace: isMonthView ? 'nowrap' : 'normal',  // No wrapping for month view, wrap otherwise
+              overflow: isMonthView ? 'hidden' : 'visible',   // Hide overflow only in month view
+              textOverflow: isMonthView ? 'ellipsis' : 'clip', // Apply ellipsis only in month view
+              maxWidth: isMonthView ? '100%' : 'unset',       // Constrain width only in month view
+              wordWrap: isMonthView ? 'normal' : 'break-word' // Break words in week and day views
+            }}>
+              <b>{eventTime} </b>
+              <span>{customerName} {serviceName}</span>
+            </div>
+          );
+        }}
+        
+        
       />
       <EventModal
         open={editable}

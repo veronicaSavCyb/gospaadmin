@@ -43,6 +43,22 @@ const ServicesTable: React.FC = () => {
       .catch(error => console.error('Error deleting service:', error));
   };
 
+  const handleServiceSaved = (newService: Service) => {
+    setData(prevData => {
+      const existingServiceIndex = prevData.findIndex(service => service.id === newService.id);
+      if (existingServiceIndex !== -1) {
+        // ✅ Update the service if it already exists
+        const updatedData = [...prevData];
+        updatedData[existingServiceIndex] = newService;
+        return updatedData;
+      } else {
+        // ✅ Add new service if it does not exist
+        return [...prevData, newService];
+      }
+    });
+  };
+  
+
   return (
     <>
       <Stack className="table-toolbar" justifyContent="space-between">
@@ -114,6 +130,7 @@ const ServicesTable: React.FC = () => {
         open={showDrawer}
         onClose={() => setShowDrawer(false)}
         serviceToEdit={serviceToEdit}
+        onServiceSaved={handleServiceSaved} // ✅ Pass callback to update table
       />
     </>
   );

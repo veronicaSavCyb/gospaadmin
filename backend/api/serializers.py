@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Service, Employee, Booking
+from .models import Service, Employee, Booking, Schedule
 
 
 # USERS
@@ -29,6 +29,18 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ["id", "first_name", "last_name", "email", "contact_number", "assigned_services", "border_color"]
+
+# SCHEDULE
+class ScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Schedule
+        fields = ['id', 'employee', 'day', 'start_time', 'end_time']
+
+    def create(self, validated_data):
+        # If we're handling many=True, validated_data will be a list
+        if isinstance(validated_data, list):
+            return Schedule.objects.bulk_create([Schedule(**item) for item in validated_data])
+        return super().create(validated_data)
 
 
 # BOOKINGS

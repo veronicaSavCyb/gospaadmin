@@ -60,37 +60,45 @@ const EventModal = ({
     }
   }, [open, selectedEvent, selectedDate, selectedTime]);
 
-  const handleSubmit = (event: React.MouseEvent) => {
+  const handleSubmit = async (event: React.MouseEvent) => {
     event.preventDefault();
     if (!selectedService || !selectedEmployee || !customerName || !phone || !bookingDate || !bookingTime) {
-      alert("Please fill all fields");
-      return;
+        alert("Please fill all fields");
+        return;
     }
 
     const bookingData = {
-      id: selectedEvent?.id,
-      service: selectedService,
-      employee: selectedEmployee,
-      customer_name: customerName,
-      phone,
-      booking_date: bookingDate.toISOString().split('T')[0],
-      booking_time: bookingTime.toISOString().split('T')[1].substring(0, 5),
-      duration,
+        id: selectedEvent?.id,
+        service: selectedService,
+        employee: selectedEmployee,
+        customer_name: customerName,
+        phone,
+        booking_date: bookingDate.toISOString().split('T')[0],
+        booking_time: bookingTime.toISOString().split('T')[1].substring(0, 5),
+        duration,
     };
 
-    fetch(`${API_BASE_URL}/api/bookings/${selectedEvent?.id ? `${selectedEvent.id}/` : ''}`, {
-      method: selectedEvent?.id ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bookingData),
-    })
-    .then((res) => res.json())
-    .then((updatedBooking) => {
-      console.log("Booking updated:", updatedBooking);
-      onAddEvent(updatedBooking);
-      onClose();
-    })
-    .catch((error) => console.error("Error updating booking:", error));
-  };
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/bookings/${selectedEvent?.id ? `${selectedEvent.id}/` : ''}`, {
+            method: selectedEvent?.id ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bookingData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to ${selectedEvent?.id ? "update" : "create"} booking`);
+        }
+
+        const updatedBooking = await response.json();
+        console.log("Booking saved:", updatedBooking);
+
+        onAddEvent(updatedBooking);  // Ensures event updates or adds correctly in calendar
+        onClose();
+    } catch (error) {
+        console.error("Error saving booking:", error);
+    }
+};
+
 
   const handleDelete = () => {
     if (!selectedEvent?.id) return;

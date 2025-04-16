@@ -33,6 +33,17 @@ class Employee(models.Model):
                 self.border_color = "#ccc"  # Default if all colors are used
         super().save(*args, **kwargs)
 
+# SCHEDULE
+class Schedule(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='schedules')
+    day = models.CharField(max_length=20)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    def __str__(self):
+        return f"{self.employee} - {self.day}: {self.start_time}–{self.end_time}"
+
+
 # BOOKINGS
 class Booking(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE)

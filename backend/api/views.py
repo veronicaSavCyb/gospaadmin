@@ -6,8 +6,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework import status
-from .models import Service, Employee, Booking 
-from .serializers import ServiceSerializer, UserSerializer, EmployeeSerializer, BookingSerializer
+from .models import Service, Employee, Booking, Schedule 
+from .serializers import ServiceSerializer, UserSerializer, EmployeeSerializer, BookingSerializer, ScheduleSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # USERS
@@ -85,6 +85,40 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.delete()
         return Response({"message": "Employee deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+# SCHEDULE
+class ScheduleViewSet(viewsets.ModelViewSet):
+    serializer_class = ScheduleSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        employee_id = self.request.query_params.get('employee')
+        if employee_id:
+            return Schedule.objects.filter(employee_id=employee_id)
+        return Schedule.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        many = isinstance(data, list)
+
+        if many and data:
+            employee_id = data[0].get("employee")
+            if employee_id:
+                Schedule.objects.filter(employee_id=employee_id).delete()
+
+        serializer = self.get_serializer(data=data, many=many)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            print("Schedule validation error:", e.detail)
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def perform_create(self, serializer):
+        return serializer.save()
+
 
 # BOOKINGS
 class BookingViewSet(viewsets.ModelViewSet):
